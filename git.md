@@ -28,7 +28,7 @@
 
 - 回滚工作区（新建文件）：`git rm --cached <file>/*`
 - 回滚工作区（修改文件）：`git checkout -- <file>/*`
-- 回滚缓存区（修改文件）：` git reset HEAD <file>/* && git checkout -- <file>/*`
+- 回滚缓存区（修改文件）：`git reset HEAD <file>/* && git checkout -- <file>/*`
 - 回滚本地 Git 仓库：`git reset --hard <commit_id>`
 - 回滚远端 Git 仓库：`git reset --hard <commit_id> && git push -f`
 
