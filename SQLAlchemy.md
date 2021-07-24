@@ -1,58 +1,37 @@
-# SQLAlchemy 笔记
+## SQLAlchemy
 
 1. [SQLAlchemy Core](https://github.com/hsxhr-10/Notes/blob/master/Python-Web/SQLAlchemy%E7%AC%94%E8%AE%B0.md#sqlalchemy-core)
 2. [SQLAlchemy ORM](https://github.com/hsxhr-10/Notes/blob/master/Python-Web/SQLAlchemy%E7%AC%94%E8%AE%B0.md#sqlalchemy-orm)
 
-SQLAlchemy 是 Python ORM 框架，用来将数据库表映射成编程语言的对象，同时解耦应用程序和数据库，让应用程序可以用同一套 API
-去操作不同的数据库
-
 ![](https://raw.githubusercontent.com/hsxhr-10/Notes/master/image/pythonwebsqla-1.png)
 
-根据官网提供的架构图，可知 SQLAlchemy 分为三部分，最底层的 DBAPI 是具体数据库的驱动接口；中间的 Core 提供了各种核心组件；最上层的
-ORM 负责提供对象关系映射建模和一些高级的接口。 SQLAlchemy 还提供了 Dialect（方言）的概念，专门用于处理、提供一些底层数据库特有的功能
+- Core 提供了各种核心组件
+- ORM 负责提供对象关系映射建模和一些高级的接口
+- DBAPI 代表对应的数据库驱动
 
-> 讨论以 MySQL 为主
+### 一些概念
 
-## SQLAlchemy Core
-
-### (1) Schema/Type 组件
-
-Schema/Type 组件负责映射底层数据库的字段数据类型
-
-通用类型有两类：
+#### Schema/Type：提供字段数据类型
 
 - [Generic Types](https://docs.sqlalchemy.org/en/14/core/type_basics.html#generic-types)
 - [SQL Standard and Multiple Vendor Types](https://docs.sqlalchemy.org/en/14/core/type_basics.html#sql-standard-and-multiple-vendor-types)
-
-MySQL 方言：
-
 - [MySQL Data Types](https://docs.sqlalchemy.org/en/14/dialects/mysql.html#mysql-data-types)
-
-其他方言：
-
 - [Included Dialects](https://docs.sqlalchemy.org/en/13/dialects/index.html#included-dialects)
 
-### (2) SQL Expression Language 组件
-
-SQL Expression Language 组件负责映射 SQL 语句的一些操作（比如 in/or/and/not/desc/asc 等）
-
-常用的有三部分：
+#### SQL Expression Language：提供 `in/or/and/not/desc/asc` 等操作
 
 - [Column Element Foundational Constructors](https://docs.sqlalchemy.org/en/14/core/sqlelement.html#column-element-foundational-constructors)
 - [Column Element Modifier Constructors](https://docs.sqlalchemy.org/en/14/core/sqlelement.html#column-element-modifier-constructors)
 - [ColumnElement](https://docs.sqlalchemy.org/en/14/core/sqlelement.html#sqlalchemy.sql.expression.ColumnElement)
 
-### (3) Engine 和 Connection Pooling 组件
-
-**⭐️ Engine 和连接池都是线程安全️**。根据官网的示意图可知 Engine、连接池和其他组件的关系
+#### Engine：提供连接池配置
 
 ![](https://raw.githubusercontent.com/hsxhr-10/Notes/master/image/pythonwebsqla-2.png)
 
-#### create_engine() 方法
+```
+⭐️ Engine 和连接池都是线程安全️
 
-用于创建 Engine 对象和配置连接池
-
-常用参数说明：
+create_engine() 方法：用于创建 Engine 对象和配置连接池
 
 - url：数据库连接 URL，格式 `dialect+driver://username:password@host:port/database`
   。具体参考 [这里](https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls)
@@ -65,30 +44,45 @@ SQL Expression Language 组件负责映射 SQL 语句的一些操作（比如 in
 - pool_pre_ping：每次从池中取出连接时，是否检测连接的有效性。一般设置为 True 确保使用有效的连接
 - pool_recycle=-1：主动回收连接的时长。MySQL 默认 8 小时后如果检测到空闲连接，就会主动断开连接
 - pool_timeout=30：从池中获取连接的等待时间。单位秒
+```
 
-## SQLAlchemy ORM
+```
+with engine.connect() as connection:
+    connection.execute(text("insert into table values ('foo')"))
+    connection.commit()
 
-### (1) Session
+with engine.connect() as conn:
+    conn.execute(...)
+    conn.execute(...)
+    conn.commit()
 
-Session 代表一次 SQL 操作的会话，默认不是 autucommit
+    conn.execute(...)
+    conn.execute(...)
+    conn.commit()
 
-#### sessionmaker() 类说明
+# 事务
+with engine.begin() as connection:
+    connection.execute(text("insert into table values ('foo')"))
+    
+with engine.connect() as conn:
+    with conn.begin():
+        conn.execute(...)
+        conn.execute(...)
 
-用于创建 Session 对象
+    with conn.begin():
+        conn.execute(...)
+        conn.execute(...)
 
-常用参数说明：
+https://docs.sqlalchemy.org/en/14/core/future.html#sqlalchemy.future.Connection
+```
 
-- bind：与 Session 关联的 Engine 对象
-- autoflush=True：flush 之后 SQL 才会被执行。一般设置成 True，就不需要每条 SQL 后面 flush 一下
-- autocommit=False：是否自动提交事务
-- expire_on_commit=True：Session 是否在事务提交之后失效
+#### Session 对象：代表一次 SQL 操作的会话，默认 autucommit 为 False
 
-详细参考 [这里](https://docs.sqlalchemy.org/en/14/orm/session_api.html#sqlalchemy.orm.Session)
+📢 Engine 线程安全，优先用 Engine。
 
-**⭐️ Session 不是线程安全，可以用 `contextmanager` 加 `yield` 解决️**
-，或者用 `from sqlalchemy.orm import scoped_session` 解决也可以
+```
+⭐️ Session 不是线程安全，可以用 `contextmanager` 加 `yield` 解决️
 
-```python
 from contextlib import contextmanager
 
 
@@ -110,9 +104,18 @@ with session_factory() as session:
     pass
 ```
 
-### (2) ORM 建模
+```
+sessionmaker()：用于创建 Session 对象
 
-有四张表，factory 表和 product 表是一对多关系，orders 表和 product 表关系是多对多
+- bind：与 Session 关联的 Engine 对象
+- autoflush=True：flush 之后 SQL 才会被执行。一般设置成 True，就不需要每条 SQL 后面 flush 一下
+- autocommit=False：是否自动提交事务
+- expire_on_commit=True：Session 是否在事务提交之后失效
+```
+
+### ORM 建模
+
+factory 表和 product 表是一对多关系，orders 表和 product 表关系是多对多。
 
 ```sql
 CREATE TABLE factory
@@ -166,8 +169,6 @@ CREATE TABLE orders_product
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表和商品表的多对多关系';
 ```
-
-根据表结构，利用 Schema/Type 组件提供的各种数据类型，对应的 ORM 模型如下：
 
 ```python
 from sqlalchemy.ext.declarative import declarative_base
@@ -228,97 +229,71 @@ class OrdersProduct(_BaseMixin):
     product_id = Column(String(255), nullable=False, unique=True)
 ```
 
-### (3) SQL 操作
+### ORM 级别的 SQL 操作
 
-利用 ORM 本身提供的操作接口和 SQL Expression Language 组件，可以完成日常 SQL 操作
+单表查询：
 
-#### 单表查询
+```
+# select * from factory;
+with session_factory() as session:
+  session.query(Factory).all()
 
-- `SELECT * FROM factory;`
-    ```python
-    with session_factory() as session:
-        session.query(Factory).all()
-    ```
-- `SELECT * FROM factory WHERE name='工厂1号';`
-    ```python
-    with session_factory() as session:
-        session.query(Factory).filter(Factory.name == "工厂1号").all()
-    ```
-- `SELECT * FROM factory WHERE id='a1d760f2-275e-4efb-ae02-dc4d5434fb10' AND name='工厂1号';`
-    ```python
-    with session_factory() as session:
-        session.query(Factory).filter(Factory.id == "a1d760f2-275e-4efb-ae02-dc4d5434fb10").filter(Factory.name == "工厂1号").all()
-    ```
-- `SELECT * FROM factory WHERE id='a1d760f2-275e-4efb-ae02-dc4d5434fb10' OR name='工厂1号';`
-    ```python
-    from sqlalchemy import or_
-    
-    with session_factory() as session:
-        session.query(Factory).filter(or_(Factory.name == "工厂1号", Factory.name == "工厂2号")).all()
-    ```
-- `SELECT * FROM factory LIMIT 1;`
-    ```python
-    with session_factory() as session:
-        session.query(Factory).first()
-    ```
-- `SELECT * FROM factory ORDER BY name DESC LIMIT 1;`
-    ```python
-    with session_factory() as session:
-        session.query(Factory).order_by(Factory.name.desc()).first()
-    ```
+# select * from factory where name='工厂1号';     
+with session_factory() as session:
+  session.query(Factory).filter(Factory.name == "工厂1号").all()
 
-#### 连表查询
+# select * from factory where id='a1d760f2-275e-4efb-ae02-dc4d5434fb10' and name='工厂1号';
+with session_factory() as session:
+  session.query(Factory).filter(Factory.id == "a1d760f2-275e-4efb-ae02-dc4d5434fb10").filter(Factory.name == "工厂1号").all()
 
-- `SELECT p.name, f.name FROM product p INNER JOIN factory f ON p.factory_id=f.factory_id;`
-    ```python
-    with session_factory() as session:
-        session.query(Factory.name, Product.name).join(Product, Factory.factory_id == Product.factory_id).all()
-    ```
-    ```python
-    with session_factory() as session:
-        session.query(Factory.name, Product.name).filter(Factory.factory_id == Product.factory_id).all()
-    ```
-- `SELECT p.name, f.name FROM product p INNER JOIN factory f ON p.factory_id=f.factory_id WHERE f.name='工厂2号'";`
-    ```python
-    with session_factory() as session:
-        session.query(Factory.name, Product.name).join(Product, Factory.factory_id == Product.factory_id).filter(Factory.name == "工厂2号").all()
-    ```
-- `SELECT t1.name, t2.name, t3.name FROM table1 t1 INNER JOIN t2 ON t1.id=t2.id LEFT JOIN table3 t3 ON t2.id=t3.id WHERE t1.name='aaa' AND t3.name='ccc';`
-    ```python
-    with session_factory() as session:
-        session.query(table1.name, table2.name, table3.name)\
-               .join(table2, table1.id == table2.id)\
-               .outerjoin(table3, table2.id == table3.id)\
-               .filter(table1.name == "aaa", table3.name == "ccc")\
-               .all()
-    ```
+# select * from factory where id='a1d760f2-275e-4efb-ae02-dc4d5434fb10' or name='工厂1号';
+from sqlalchemy import or_
+with session_factory() as session:
+  session.query(Factory).filter(or_(Factory.name == "工厂1号", Factory.name == "工厂2号")).all()
+  
+# select * from factory limit 1;
+with session_factory() as session:
+  session.query(Factory).first()
 
-#### 更新
+# select * from factory order by name desc limit 1;
+with session_factory() as session:
+  session.query(Factory).order_by(Factory.name.desc()).first()
+```
 
-- `UPDATE factory SET name='工厂10号' WHERE factory_id='a1d760f2-275e-4efb-ae02-dc4d5434fb10';`
-    ```python
-    # 修改一条或者多条数据
-    with session_factory() as session:
-        session.query(Factory).filter(Factory.factory_id == "a1d760f2-275e-4efb-ae02-dc4d5434fb10").update({"name": "工厂10号"})
-    ```
-    ```python
-    # 修改一条数据
-    with session_factory() as session:
-        factory = session.query(Factory).filter(Factory.factory_id == "a1d760f2-275e-4efb-ae02-dc4d5434fb10").one()
-        factory.name = "工厂10号"
-    ```
+连表查询：
 
-#### 插入
+```
+# select p.name, f.name from product p inner join factory f on p.factory_id=f.factory_id;
+with session_factory() as session:
+  session.query(Factory.name, Product.name).join(Product, Factory.factory_id == Product.factory_id).all()
 
-- `INSERT INTO factory(factory_id, name) VALUE("050b90a7-590f-410d-ad4b-61686b81436f", "工厂101号");`
-    ```python
-    with session_factory() as session:
-        factory = Factory()
-        factory.factory_id = "050b90a7-590f-410d-ad4b-61686b81436f"
-        factory.name = "工厂101号"
-    ```
+with session_factory() as session:
+  session.query(Factory.name, Product.name).filter(Factory.factory_id == Product.factory_id).all()
 
-#### 原生 SQL
+# select p.name, f.name from product p inner join factory f on p.factory_id=f.factory_id where f.name='工厂2号'";
+with session_factory() as session:
+  session.query(Factory.name, Product.name).join(Product, Factory.factory_id == Product.factory_id).filter(Factory.name == "工厂2号").all()
+
+# select t1.name, t2.name, t3.name from table1 t1 inner join t2 on t1.id=t2.id LEFT join table3 t3 on t2.id=t3.id where t1.name='aaa' and t3.name='ccc';
+with session_factory() as session:
+  session.query(table1.name, table2.name, table3.name)\
+         .join(table2, table1.id == table2.id)\
+         .outerjoin(table3, table2.id == table3.id)\
+         .filter(table1.name == "aaa", table3.name == "ccc")\
+         .all()
+```
+
+插入：
+
+```
+# insert into factory(factory_id, name) VALUE("050b90a7-590f-410d-ad4b-61686b81436f", "工厂101号");
+with session_factory() as session:
+  factory = Factory()
+  factory.factory_id = "050b90a7-590f-410d-ad4b-61686b81436f"
+  factory.name = "工厂101号"
+```
+
+raw SQL：
 
 ```python
 from sqlalchemy.sql import text
@@ -330,7 +305,7 @@ for row in res:
         print("{}={}".format(k, v))
 ```
 
-## 参考
+### 参考
 
 - [Query API](https://docs.sqlalchemy.org/en/14/orm/query.html#query-api)
 - [Multi-threaded use of SQLAlchemy](https://stackoverflow.com/questions/6297404/multi-threaded-use-of-sqlalchemy#:~:text=Session%20objects%20are%20not%20thread,%2C%20but%20are%20thread%2Dlocal.&text=If%20you%20don't%20want,object%20by%20default%20uses%20threading.)

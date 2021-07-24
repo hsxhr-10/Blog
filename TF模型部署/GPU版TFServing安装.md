@@ -1,4 +1,4 @@
-# GPU 版 TFServing 安装
+## 安装 GPU 版 TFServing
 
 1. 安装 Docker-CE, 版本 18.06 或以上, 建议 20.10.0
     ```bash
@@ -23,8 +23,8 @@
     $ sudo systemctl restart docker
     $ sudo docker run --rm --gpus all nvidia/cuda:10.1-base nvidia-smi
     ```
-    
-    安装成功会有类似 `nvidia-smi` 命令的输出:
+
+   安装成功会有类似 `nvidia-smi` 命令的输出:
     ```bash
     +-----------------------------------------------------------------------------+
     | NVIDIA-SMI 450.51.06    Driver Version: 450.51.06    CUDA Version: 11.0     |
@@ -46,15 +46,16 @@
     |  No running processes found                                                 |
     +-----------------------------------------------------------------------------+
     ```
-    
-    > nvidia/cuda 的 Docker 镜像版本需要和 CUDA 驱动版本对应, [参考](https://github.com/NVIDIA/nvidia-docker/wiki/CUDA#requirements)
-    
+
+   > nvidia/cuda 的 Docker 镜像版本需要和 CUDA 驱动版本对应, [参考](https://github.com/NVIDIA/nvidia-docker/wiki/CUDA#requirements)
+
 3. 安装 GPU 版本的 Tensorflow Serving
     ```bash
     $ sudo docker pull tensorflow/serving:latest-gpu
     ```
 
-参考资料:
+## 参考
+
 - [官网](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker)
 - [在Docker中使用Tensorflow Serving](http://fancyerii.github.io/books/tfserving-docker/#%E4%BD%BF%E7%94%A8gpu)
 - [--gpus all 替代 --runtime=nvidia](https://github.com/NVIDIA/nvidia-docker/issues/838#issuecomment-558962338)

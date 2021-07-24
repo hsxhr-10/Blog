@@ -1,12 +1,12 @@
-# requests 笔记
+## requests
 
-requests 是一个常用的 HTTP/HTTPS 客户端，对应的是阻塞 IO，想要非阻塞 IO 可以配合线程、gevent 使用，或者用 [httpx](https://github.com/encode/httpx)
+- request + gevent -> 异步 HTTP 客户端
+- 异步 HTTP 客户端：https://github.com/encode/httpx
 
-## requests 的使用
+Session 对象：
 
-### Session 对象
-
-`Session()` 会使用底层库 urllib3 的连接池，对 TCP 连接进行复用，对于向同一个目标主机进行多次请求的场景会有性能提升
+`Session()` 会使用底层库 urllib3 的连接池，对 TCP 连接进行复用，对于向同一个目标主机进行多次请求的场景会有性能提升。版本比较新的
+requests（比如 2.25.1） 默认使用 `Session()`。
 
 ```python
 import requests
@@ -15,18 +15,7 @@ s = requests.Session()
 s.get('https://httpbin.org/cookies')
 ```
 
-版本比较新的 requests（比如 2.25.1） 默认使用 `Session()`，源码 api.py:60
-
-```python
-def request(method, url, **kwargs):
-    # 忽略大段大段的注释
-    pass
-
-    with sessions.Session() as session:
-        return session.request(method=method, url=url, **kwargs)
-```
-
-### 常用配置
+常用配置：
 
 ```python
 import requests
@@ -42,9 +31,9 @@ r = s.get("http://www.example.org")
 print(r.status_code)
 ```
 
-### 常用操作
+常见操作：
 
-```BASH
+```
 import requests
 import shutil
 

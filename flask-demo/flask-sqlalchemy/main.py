@@ -67,7 +67,6 @@ def handle():
     data = {"code": 0, "message": "success", "data": data}
     result = json.dumps(data, ensure_ascii=False)
     response = Response(result, content_type="application/json; charset=utf-8")
-
     return response
 
 
