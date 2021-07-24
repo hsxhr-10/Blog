@@ -286,11 +286,16 @@ with session_factory() as session:
 插入：
 
 ```
-# insert into factory(factory_id, name) VALUE("050b90a7-590f-410d-ad4b-61686b81436f", "工厂101号");
-with session_factory() as session:
-  factory = Factory()
-  factory.factory_id = "050b90a7-590f-410d-ad4b-61686b81436f"
-  factory.name = "工厂101号"
+with engine.connect() as conn:
+    conn.execute(Factory.insert(), factory_id=12345678, name="HuaWei")
+
+# 批量
+with engine.connect() as conn:
+    conn.execute(Factory.insert(), [
+        {"factory_id": 72361281, "name": "Apple"},
+        {"factory_id": 12345678, "name": "HuaWei"},
+        {"factory_id": 27387283, "name": "XiaoMi"},
+    ])
 ```
 
 raw SQL：
@@ -299,7 +304,9 @@ raw SQL：
 from sqlalchemy.sql import text
 
 sql = text("select * from factory where name=:name;")
-res = engine.execute(sql, {"name": "工厂1号"})
+with engine.connect() as conn:
+    res = conn.execute(sql, {"name": "工厂1号"})
+
 for row in res:
     for k, v in row.items():
         print("{}={}".format(k, v))
