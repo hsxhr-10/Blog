@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
 ![](https://raw.githubusercontent.com/hsxhr-10/Blog/master/image/pythonio-4.png)
 
-**⭐️ 整理一下调度流程大致如下 ⭐**
+**※️ 整理一下调度流程大致如下**
 
 ![](https://raw.githubusercontent.com/hsxhr-10/Blog/master/image/pythonio-5.png)
 
@@ -223,7 +223,7 @@ async def main():
     process_pool = concurrent.futures.ProcessPoolExecutor(max_workers=4)
     await asyncio.gather(
         loop.run_in_executor(process_pool, cpu_bound),
-        before_cpu_bound(),  # 会先于 cpu_bound() 执行完毕
+        before_cpu_bound(),  # 会先于 cpu_bound() 执行完
     )
 
 
