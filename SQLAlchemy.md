@@ -47,6 +47,10 @@ create_engine() 方法：用于创建 Engine 对象和配置连接池
 ```
 
 ```
+# autocommit 在 version1.4 之后被遗弃
+# https://docs.sqlalchemy.org/en/14/core/connections.html#sqlalchemy.engine.Connection.execution_options.params.autocommit 
+# https://docs.sqlalchemy.org/en/14/changelog/migration_20.html#library-level-but-not-driver-level-autocommit-removed-from-both-core-and-orm
+
 with engine.connect() as connection:
     connection.execute(text("insert into table values ('foo')"))
     connection.commit()
@@ -288,6 +292,7 @@ with session_factory() as session:
 ```
 with engine.connect() as conn:
     conn.execute(Factory.insert(), factory_id=12345678, name="HuaWei")
+    conn.commit()
 
 # 批量
 with engine.connect() as conn:
@@ -296,6 +301,7 @@ with engine.connect() as conn:
         {"factory_id": 12345678, "name": "HuaWei"},
         {"factory_id": 27387283, "name": "XiaoMi"},
     ])
+    conn.commit()
 ```
 
 raw SQL：
