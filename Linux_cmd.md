@@ -1,3 +1,5 @@
+## 日常
+
 查找：
 
 - find 和常用参数：https://www.cnblogs.com/liuhedong/p/10813372.html
@@ -39,6 +41,8 @@ awk：
   `sudo ps aux | grep gunicorn | grep -v color | awk  'BEGIN {FS=" "} {print $2 "\t"}' | xargs kill -9`
 
 ---
+
+## 系统信息
 
 系统版本信息：
 
@@ -93,6 +97,8 @@ CPU 信息：
 
 ---
 
+## 系统性能
+
 性能分析相关：
 
 - 查看服务器可以打开的最大文件数：`cat /proc/sys/fs/file-max`
@@ -127,6 +133,8 @@ CPU 信息：
     - r_await：设备每次读 IO 所需的时间（包括等待和实际处理，单位 ms，一般小于 5ms）
     - w_await：设备每次写 IO 所需的时间（同上）
     - svctm：设备每次 IO 请求的实际处理时间，如果 r_await、w_await 远大于 svctm 的值，说明等待执行 IO 等待队列很长
+
+---
 
 ## 参考
 
