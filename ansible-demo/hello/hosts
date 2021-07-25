@@ -1,8 +1,8 @@
 [nginx]
-104.160.45.92
+localhost
 
 [backend]
-104.160.45.92
+localhost
 
 [db]
-104.160.45.92
+localhost
