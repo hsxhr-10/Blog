@@ -1,6 +1,8 @@
 - [pycharm中django的objects无代码提示、自动补全的真香方案](https://blog.csdn.net/ch_improve/article/details/110182289)
 - [解决 Django 时区设置不生效问题](https://stackoverflow.com/questions/30588926/why-the-time-is-different-from-my-time-zone-in-settings-py)
 - Django 的其中一个理念：提供各种抽象层封装、框架，目的是隔离应用代码和底层平台，方便切换不同平台时，无需修改上层代码
+- Django 更像是 它给你设想好了需求，然后它根据这些需求，设计、实现好了对应的框架和工具。如果你的需求能够被设想的需求所覆盖，那么用 Django
+  会很爽；如果你的需求超出了设想的需求，那么用 Django 会比较别扭
 
 ---
 
