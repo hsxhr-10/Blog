@@ -22,3 +22,9 @@
 ### databases
 
 - https://www.encode.io/databases/
+
+## 应用服务器
+
+### uvicorn
+
+- https://www.uvicorn.org/
